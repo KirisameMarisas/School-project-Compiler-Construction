@@ -2,6 +2,8 @@ module Lexical_Analyzer
   $flag = false
   WORDS = { "begin" => 1, "if" => 2, "then" => 3, "while" => 4, "do" => 5, "end" => 6, "letter*" => 10, "digit*" => 11, "+" => 13, "-" => 14, "*" => 15, "/" => 16, ":" => 17, ":=" => 18, "<" => 20, "<>" => 21, "<=" => 22, ">" => 23, ">=" => 24, "=" => 25, ";" => 26, "(" => 27, ")" => 28, "#" => 0, "int" => 31, "double" => 32 }
 
+  @arrays = Array.new
+
   def output(word)
     print "(#{WORDS[word]},#{word}) "
   end
@@ -11,10 +13,7 @@ module Lexical_Analyzer
   end
 
   def judge_digit(word)
-    if (word >= "0" && word <= "9")
-      return true
-    end
-    return false
+    return /\A[-+]?\d+\z/.match(word.to_s)
   end
 
   def judge_letter(word)
@@ -32,9 +31,9 @@ module Lexical_Analyzer
   def output_word(temp_word)
     if (temp_word != "")
       if (judge_letter(temp_word[0]))
-        output_lOn("letter*", temp_word)
+        #output_lOn("letter*", temp_word)
       else
-        output_lOn("digit*", temp_word)
+        #output_lOn("digit*", temp_word)
       end
     end
   end
@@ -49,7 +48,7 @@ module Lexical_Analyzer
         end
       end
     end
-    output_lOn("digit*", temp_word)
+    #output_lOn("digit*", temp_word)
   end
 
   def word_analyze(word)
@@ -63,7 +62,8 @@ module Lexical_Analyzer
       if (judge_digit(element) || judge_letter(element))
         temp_word += element
         if (temp_symbol != "")
-          output(temp_symbol)
+          #output(temp_symbol)
+          @arrays << temp_symbol
         end
         temp_symbol = ""
       else
@@ -71,10 +71,11 @@ module Lexical_Analyzer
           temp_symbol += element
           if (temp_word[0] != nil)
             if (judge_letter(temp_word[0]))
-              output_word(temp_word)
+              #output_word(temp_word)
             else
-              output_digit(temp_word)
+              #output_digit(temp_word)
             end
+            @arrays << temp_word
           end
           temp_word = ""
         end
@@ -82,14 +83,31 @@ module Lexical_Analyzer
     end
     if (temp_word != "")
       if (judge_letter(temp_word[0]))
-        output_word(temp_word)
+        #output_word(temp_word)
       else
-        output_digit(temp_word)
+        #output_digit(temp_word)
       end
+      @arrays << temp_word
     end
     if (temp_symbol != "")
-      output(temp_symbol)
+      #output(temp_symbol)
+      @arrays << temp_symbol
     end
+  end
+
+  def output
+    @arrays.each do |element|
+      if WORDS.include?(element)
+        print "(#{WORDS[element]},#{element}) "
+      else
+        if judge_digit(element)
+          print "(#{WORDS["digit*"]},#{element}) "
+        else
+          print "(#{WORDS["letter*"]},#{element}) "
+        end
+      end
+    end
+    puts
   end
 
   def main
@@ -103,18 +121,20 @@ module Lexical_Analyzer
         end
 
         if WORDS.include?(word)
-          output(word)
+          #output(word)
+          @arrays << word
         else
           word_analyze(word)
         end
       end
-      puts
+      #puts
       if (string_s[string_s.length - 1] == "#")
         break
       end
     end
+    output
+    puts @arrays.inspect
   end
-
 end
 
 =begin

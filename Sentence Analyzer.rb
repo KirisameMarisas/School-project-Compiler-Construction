@@ -183,6 +183,31 @@ module Sentence_Analyzer
     return analyze_expression(temp_variable)
   end
 
+  def analyze_expression(array)
+    pos = array.find_index(":=")
+    #analyzer the right part
+  end
+
+  def analyze_sentence(arrays)
+    length = arrays.length
+
+    for i in 0...length do 
+      if arrays[i].length > 0
+        result = analyze_expression(arrays[i])
+      else 
+        next
+      end
+      
+      if result[0]== "success" 
+        next
+      else 
+        #error
+      end
+
+    end
+
+  end
+
   def analyze_sentence(sentence, variables)
     $return_array = []
     $variables = variables

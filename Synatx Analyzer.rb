@@ -23,6 +23,9 @@ module Synatx_Analyzer
     @lines = n
   end
 
+  def main
+    arrays = LA.main 
+    
   def analyze_block(input_array)
     len = input_array.length
     array1 = input_array[0].split(%r[\s|\t])

@@ -112,7 +112,7 @@ module Lexical_Analyzer
   end
 
   def main
-    puts "Input a cod block with \'end\' end of this block"
+    puts "Input a cod block with \'#\' end of this block"
     total_arrays ||= Array.new
     while true
       s = gets.chomp
@@ -130,27 +130,20 @@ module Lexical_Analyzer
           word_analyze(word)
         end
       end
-      #puts
       total_arrays << Marshal.load(Marshal.dump(@@arrays))
       @@arrays.clear
       if (string_s[string_s.length - 1] == "#")
         break
       end
 
-      #puts @@arrays.inspect
-      #puts total_arrays.inspect
-
-      #puts string_s.inspect
     end
-    #output(total_arrays)
-    #puts total_arrays.inspect
     return total_arrays
   end
 end
 
-#=begin
+=begin
 include Lexical_Analyzer
 LA = Lexical_Analyzer
 
 LA.main
-#=end
+=end

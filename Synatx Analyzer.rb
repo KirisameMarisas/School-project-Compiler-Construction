@@ -2,131 +2,115 @@ require_relative "Lexical Analyzer"
 require_relative "Sentence Analyzer"
 
 module Synatx_Analyzer
-  $BE_array = Array.new
-  $row = 0
-  $temp_s ||= ""
-  $variables = []
-  @lines = 0
-  @start = 1
-
   include Lexical_Analyzer
   include Sentence_Analyzer
 
   LA = Lexical_Analyzer
   SA = Sentence_Analyzer
 
-  def lines
-    @lines
+  def mainSyA
+    arrays = LA.main
+    delete_end_symbol(arrays)
+
+    #puts arrays.inspect 
+    #puts arrays.length .inspect
+
+    analyze_block(arrays)
   end
 
-  def lines=(n)
-    @lines = n
+  def message_solve(message_array)
+    message_arrays = []
+    message_array.each do |each_line|
+      message_arrays << each_line.join(" ")
+    end
+
+    return message_arrays
   end
 
-  def main
-    arrays = LA.main 
-    
+  def get_last_element(array)
+    last_line = array.length
+
+    while true
+      if (array[last_line - 1].length > 0)
+        temp_line = array[last_line - 1]
+        return [last_line - 1, temp_line.length - 1]
+      else
+        last_line -= 1
+        if (last_line < 0)
+          return nil
+        end
+      end
+    end
+  end
+  
+  def merge(preview_array,message_array)
+    for i in 0...preview_array.length do
+
+      message_array.insert(i,preview_array[i])
+    end
+
+    return message_array
+
+  end
+
+  def delete_end_symbol(arrays)
+    array_length = arrays.length
+
+    for i in (array_length - 1).downto(0)
+      line_length = arrays[i].length
+      for j in (line_length - 1).downto(0)
+        if (arrays[i][j] == "#")
+          arrays[i].delete_at(j)
+          return
+        end
+      end
+    end
+  end
+
   def analyze_block(input_array)
-    len = input_array.length
-    array1 = input_array[0].split(%r[\s|\t])
     flag = false
 
-    if array1[0] == "begin"
-      flag = true
-      array1.delete_at(0)
-    else
-      #error : lack 'begin'
-      return "lines :#{@start} error : lack 'begin'"
-    end
+    temp_array = []
 
-    array2 = input_array[len - 1].split(%r[\s|\t])
-    len = array2.length
+    input_array.each do |each_line|
+      for i in 0...each_line.length
+        if (each_line[i] == "begin")
+          flag = true
+          last_element = get_last_element(input_array)
 
-    if array2[len - 1] == "end"
-      if flag
-        flag = false
-      else
-        #error : lack 'begin'
-        return "lines :#{@start} error : lack 'begin'"
+          if (input_array[last_element[0]][last_element[1]] == "end")
+            input_array[last_element[0]].delete_at(last_element[1])
+          else
+            #error miss 'end'
+            temp_array << ["line #{last_element[0] + 1} : ",SA.error_load([],"miss end")]
+          end
+
+          each_line.delete_at(i)
+        else
+          break
+        end
+
+        if (each_line[i] == "end")
+
+          #error miss 'begin'
+          temp_array << ["line #{i} : ",SA.error_load([],"miss begin")]
+        end
       end
-      array2.delete_at(len - 1)
-    else
-      if flag
-        #error : lack 'end'
-        return "lines :#{lines} error : lack 'end'"
-      end
     end
 
-    if array1.length > 0
-      input_array[0] = array1
-    else
-      input_array.delete_at(0)
-      @start += 1
+    if (!flag)
+      #error miss 'begin'
+      temp_array << ["line 1 : ",SA.error_load([],"miss begin")]
     end
-
-    if array2.length > 0
-      input_array[input_array.length - 1] = array2
-    else
-      input_array.delete_at(input_array.length - 1)
-      @lines -= 1
-    end
-
-    arrayp = SA.split_sentence(input_array)
-
-    if arrayp.include?('error :')
-      return arrayp.join(' ')
-    end
-
-    #puts arrayp.inspect
-
-    #puts @lines.inspect
-
-    variables = []
-    arrayp.each do |each_sentence|
-      result = SA.analyze_sentence(each_sentence, $variables)
-      #puts result.inspect
-      result.delete("success")
-      if (result.include?("error :"))
-        #error solve
-        return "lines :#{@start} #{result.join(' ')} "
-      end
-      @start += 1
-    end
-
-    return "success"
+    message_array = SA.analyze_sentence(input_array)
+    message_array = merge(temp_array,message_array)
+    message_array = message_solve(message_array)
+    puts message_array
   end
 end
-
-require "time"
-require "thread"
-
-#require_relative "Synatx Analyzer"
 
 include Synatx_Analyzer
 
-SA = Synatx_Analyzer
+SyA = Synatx_Analyzer
 
-array = []
-length =0
-
-puts "please input the code block in next lines"
-puts 
-
-while true
-  s = gets.chomp
-
-  len = s.length
-
-  length += 1
-  if (s[len - 1] != "#")
-    array << s
-  else
-    s.chop!
-    array << s
-    break
-  end
-end
-
-
-SA.lines = length
-puts SA.analyze_block(array)
+SyA.mainSyA

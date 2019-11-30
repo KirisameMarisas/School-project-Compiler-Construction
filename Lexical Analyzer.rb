@@ -4,14 +4,6 @@ module Lexical_Analyzer
 
   @@arrays = Array.new
 
-  def output(word)
-    print "(#{WORDS[word]},#{word}) "
-  end
-
-  def output_lOn(flag, word)
-    print "(#{WORDS[flag]},#{word}) "
-  end
-
   def judge_digit(word)
     return /\A[-+]?\d+\z/.match(word.to_s)
   end
@@ -26,29 +18,6 @@ module Lexical_Analyzer
       return true
     end
     return false
-  end
-
-  def output_word(temp_word)
-    if (temp_word != "")
-      if (judge_letter(temp_word[0]))
-        #output_lOn("letter*", temp_word)
-      else
-        #output_lOn("digit*", temp_word)
-      end
-    end
-  end
-
-  def output_digit(temp_word)
-    if (temp_word != "")
-      temp_word.each_char do |element|
-        if (judge_letter(element))
-          $flag = true
-          puts "error"
-          return
-        end
-      end
-    end
-    #output_lOn("digit*", temp_word)
   end
 
   def word_analyze(word)
@@ -70,11 +39,6 @@ module Lexical_Analyzer
         if WORDS.include?(element)
           temp_symbol += element
           if (temp_word[0] != nil)
-            if (judge_letter(temp_word[0]))
-              #output_word(temp_word)
-            else
-              #output_digit(temp_word)
-            end
             @@arrays << temp_word
           end
           temp_word = ""
@@ -82,11 +46,6 @@ module Lexical_Analyzer
       end
     end
     if (temp_word != "")
-      if (judge_letter(temp_word[0]))
-        #output_word(temp_word)
-      else
-        #output_digit(temp_word)
-      end
       @@arrays << temp_word
     end
     if (temp_symbol != "")
@@ -135,7 +94,6 @@ module Lexical_Analyzer
       if (string_s[string_s.length - 1] == "#")
         break
       end
-
     end
     return total_arrays
   end

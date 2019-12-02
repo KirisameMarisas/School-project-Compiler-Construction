@@ -8,8 +8,9 @@ module Lexical_Analyzer
     return /\A[-+]?\d+\z/.match(word.to_s)
   end
 
-  def judge_letter(word)
+  def judge_letter(input_word)
     #puts word
+    word = input_word[0]
 
     if (word >= "a" && word <= "z")
       return true
@@ -24,6 +25,10 @@ module Lexical_Analyzer
     temp_word = ""
     temp_symbol = ""
     word.each_char do |element|
+      if (element == ";")
+        break
+      end
+
       if ($flag)
         return
       end
@@ -37,10 +42,17 @@ module Lexical_Analyzer
         temp_symbol = ""
       else
         if WORDS.include?(element)
-          temp_symbol += element
+          
           if (temp_word[0] != nil)
             @@arrays << temp_word
           end
+
+          if ("+-*/%".include?(element))
+            @@arrays << element
+          else 
+            temp_symbol += element
+          end
+
           temp_word = ""
         end
       end
@@ -52,6 +64,8 @@ module Lexical_Analyzer
       #output(temp_symbol)
       @@arrays << temp_symbol
     end
+
+    @@arrays << ";"
   end
 
   def output(arrays)
@@ -103,5 +117,6 @@ end
 include Lexical_Analyzer
 LA = Lexical_Analyzer
 
-LA.main
+LA.output(LA.main)
+
 =end

@@ -1,7 +1,8 @@
 
-require_relative "Lexical Analyzer.rb"
+
 
 module Sentence_Analyzer
+  require_relative "Lexical Analyzer.rb"
   include Lexical_Analyzer
   LA = Lexical_Analyzer
 
@@ -45,7 +46,7 @@ module Sentence_Analyzer
       end
 
       if (array[i] == ")")
-        if (flag_number)
+        if (!flag_number)
           #error
           result = error_load(result, ["\'#{array[i]}\'", "wrong symbol"])
           return result
@@ -71,7 +72,7 @@ module Sentence_Analyzer
             if (!flag_number)
               #error
               result = error_load(result, ["\'#{array[i]}\'", "wrong symbol"])
-              return result
+              return result 
             end
 
             flag_number = false
@@ -91,22 +92,18 @@ module Sentence_Analyzer
   def analyze_sentence(arrays)
     length = arrays.length
     line_status_array = []
-    for i in 0...length
+    #for i in 0...length
 
-      #puts arrays[i].inspect
+    #puts arrays[i].inspect
 
-      if arrays[i].length > 0
-        result = analyze_expression(arrays[i])
-      else
-        next
-      end
-
-      if (result[0] != "success")
-        result.insert(0, "line #{i + 1} : ")
-      end
-
-      line_status_array << result
+    if arrays.length > 0
+      result = analyze_expression(arrays)
+    else
+      return []
     end
-    return line_status_array
+
+    line_status_array << result
+    #end
+    return line_status_array.join(" ")
   end
 end

@@ -65,7 +65,7 @@ module Lexical_Analyzer
       @@arrays << temp_symbol
     end
 
-    @@arrays << ";"
+    #@@arrays << ";"
   end
 
   def output(arrays)
@@ -89,6 +89,7 @@ module Lexical_Analyzer
     total_arrays ||= Array.new
     while true
       s = gets.chomp
+      s.strip!
       string_s = s.split(" ")
 
       string_s.each do |word|
